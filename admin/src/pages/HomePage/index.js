@@ -7,7 +7,7 @@ import './index.css';
 import {dracula} from '@uiw/codemirror-theme-dracula';
 
 
-import React, {memo, useState} from 'react';
+import React, {memo, useState, useEffect} from 'react';
 import {ContentLayout, HeaderLayout} from '@strapi/design-system/Layout';
 import {request, useNotification} from '@strapi/helper-plugin';
 import {Divider, Button, Box, Table, Thead, Tbody, Tr, Th, Td} from '@strapi/design-system';
@@ -24,9 +24,7 @@ function HomePage() {
   const toggleNotification = useNotification();
 
   const [code, setCode] = useState(
-    'SELECT email FROM admin_users LIMIT 1;\n' +
-    'SELECT * FROM admin_users LIMIT 1;\n' +
-    'SELECT firstname, lastname FROM admin_users LIMIT 1;'
+    'SELECT * FROM admin_users LIMIT 1;'
   );
 
   const [tableData, setTableData] = useState([]);
@@ -65,7 +63,6 @@ function HomePage() {
           id: `${getTrad('notification.info.execute.success')}`,
         },
       });
-
       setTableData(response.results);
     } catch (err) {
       console.error(err);
@@ -137,16 +134,16 @@ function HomePage() {
             if (data.result.length) {
               return (
                 <div key={`table_${index}`} className="raw-query_query">
-                  <p><b>Query:</b><small>{data.result.length} Results</small></p>
+                  <p><b>Query:</b><small>{data.result[0].length} Results</small></p>
                   <div className="code">
                     <pre>{data.query};</pre>
                   </div>
                   <Box>
-                    <Table colCount={getTableHeaders(data.result).length} rowCount={data.result.length}>
+                    <Table colCount={getTableHeaders(data.result[0]).length} rowCount={data.result[0].length}>
                       <Thead>
                         <Tr>
                           {
-                            getTableHeaders(data.result[0]).map((th, index) => {
+                            getTableHeaders(data.result[0][0]).map((th, index) => {
                               return (
                                 <Th style={{padding: '16px'}} key={`th_${index}`}>
                                   {th}
@@ -158,7 +155,7 @@ function HomePage() {
                       </Thead>
                       <Tbody>
                         {
-                          getTableRows(data.result).map((tr, index) => {
+                          getTableRows(data.result[0]).map((tr, index) => {
                             return (
                               <Tr key={`tr_${index}`}>
                                 {
